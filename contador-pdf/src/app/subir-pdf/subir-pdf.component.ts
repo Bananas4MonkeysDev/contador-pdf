@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-subir-pdf',
@@ -15,31 +16,28 @@ export class SubirPdfComponent {
   archivo: File | null = null;
   isHovering = false;
   cargando = false;
-  constructor(private http: HttpClient) { }
 
-  // ✅ Selección por input file
+  constructor(private http: HttpClient) {}
+
   onFileSelected(event: any) {
     const file = event.target.files[0];
     if (file && file.type === 'application/pdf') {
       this.archivo = file;
     } else {
-      alert('Por favor selecciona un archivo PDF válido.');
+      Swal.fire('Archivo inválido', 'Por favor selecciona un archivo PDF válido.', 'error');
     }
   }
 
-  // ✅ Drag & Drop: arrastrar encima
   onDragOver(event: DragEvent) {
     event.preventDefault();
     this.isHovering = true;
   }
 
-  // ✅ Drag & Drop: salir del área
   onDragLeave(event: DragEvent) {
     event.preventDefault();
     this.isHovering = false;
   }
 
-  // ✅ Drag & Drop: soltar archivo
   onDrop(event: DragEvent) {
     event.preventDefault();
     this.isHovering = false;
@@ -49,33 +47,44 @@ export class SubirPdfComponent {
       if (file.type === 'application/pdf') {
         this.archivo = file;
       } else {
-        alert('Solo se permiten archivos PDF.');
+        Swal.fire('Archivo inválido', 'Solo se permiten archivos PDF.', 'warning');
       }
     }
   }
 
-  // ✅ Enviar archivo al backend
   enviarPDF() {
     if (!this.archivo) return;
 
     this.cargando = true;
 
+    Swal.fire({
+      title: 'Procesando...',
+      text: 'Estamos enumerando tu documento. Esto puede tardar un momento.',
+      didOpen: () => Swal.showLoading(),
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+    });
+
     const formData = new FormData();
     formData.append('file', this.archivo);
 
-    this.http.post('http://contador-pdf-production.up.railway.app/api/contar-numerar', formData, {
+    this.http.post('https://contador-pdf-production.up.railway.app/api/contar-numerar', formData, {
       responseType: 'blob'
     }).subscribe(blob => {
       this.cargando = false;
+      Swal.close();
 
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
       a.download = 'pdf_numerado.pdf';
       a.click();
+
+      Swal.fire('Completado', 'Tu archivo ha sido descargado con éxito.', 'success');
     }, error => {
       this.cargando = false;
-      alert('Hubo un error al procesar el PDF.');
+      Swal.close();
+      Swal.fire('Error', 'Hubo un problema al procesar el PDF.', 'error');
     });
   }
 }
