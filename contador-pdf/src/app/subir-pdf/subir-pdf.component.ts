@@ -63,7 +63,7 @@ export class SubirPdfComponent {
     const formData = new FormData();
     formData.append('file', this.archivo);
 
-    this.http.post('http://localhost:8080/api/contar-numerar', formData, {
+    this.http.post('http://contador-pdf-production.up.railway.app/api/contar-numerar', formData, {
       responseType: 'blob'
     }).subscribe(blob => {
       this.cargando = false;
