@@ -1,28 +1,27 @@
 # Etapa 1: Build de la app con Gradle
 FROM eclipse-temurin:19-jdk AS build
 
-# Crear carpeta de trabajo
 WORKDIR /app
 
-# Copiar archivos
+# Copiar todo el backend (asegúrate de que el Dockerfile esté dentro de contador-pdf-backend/)
 COPY . .
 
-# Dar permisos al gradlew (importante en Linux)
+# Asegurar permisos de ejecución para gradlew
 RUN chmod +x ./gradlew
 
-# Ejecutar build sin tests
+# Compilar el proyecto (sin ejecutar tests)
 RUN ./gradlew clean build -x test
 
-# Etapa 2: Imagen final y ligera
+# Etapa 2: Imagen final
 FROM eclipse-temurin:19-jre
 
 WORKDIR /app
 
-# Copiar el jar desde la etapa anterior
-COPY --from=build /app/build/libs/contador-pdf-backend-0.0.1-SNAPSHOT.jar app.jar
+# Copiar el .jar generado desde la etapa de build
+COPY --from=build /app/build/libs/*.jar app.jar
 
 # Exponer el puerto de Spring Boot
 EXPOSE 8080
 
-# Comando para correr el JAR
+# Ejecutar la aplicación
 ENTRYPOINT ["java", "-jar", "app.jar"]
