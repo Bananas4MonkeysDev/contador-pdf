@@ -1,0 +1,28 @@
+<div class="pdf-uploader">
+  <h1>Contador y Numerador de PDF</h1>
+
+  <!-- El contenedor se convierte en el label para el input -->
+  <label class="dropzone-container"
+         (dragover)="onDragOver($event)"
+         (drop)="onDrop($event)"
+         (dragleave)="onDragLeave($event)"
+         [class.hovered]="isHovering"
+         for="fileInput">
+
+    <mat-icon class="upload-icon" fontIcon="description" aria-hidden="true"></mat-icon>
+
+    <p class="main-text">Arrastra un archivo hasta aquí, o</p>
+    <span class="upload-link">Haz clic para seleccionar</span>
+
+    <p class="file-info">Tipo permitido: <strong>PDF</strong></p>
+    <p class="file-hint" *ngIf="archivo">{{ archivo.name }}</p>
+  </label>
+
+  <input type="file" id="fileInput" (change)="onFileSelected($event)" accept="application/pdf" hidden />
+
+  <button class="upload-btn" (click)="enviarPDF()" [disabled]="!archivo">
+    Procesar PDF
+  </button>
+
+  <p class="nota">El archivo será enumerado en la esquina inferior y se descargará automáticamente.</p>
+</div>
