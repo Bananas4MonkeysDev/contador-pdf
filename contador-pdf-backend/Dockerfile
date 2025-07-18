@@ -19,7 +19,7 @@ FROM eclipse-temurin:19-jre
 WORKDIR /app
 
 # Copiar el jar desde la etapa anterior
-COPY --from=build /app/build/libs/*.jar app.jar
+COPY --from=build /app/build/libs/contador-pdf-backend-0.0.1-SNAPSHOT.jar app.jar
 
 # Exponer el puerto de Spring Boot
 EXPOSE 8080
